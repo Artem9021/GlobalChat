@@ -34,7 +34,7 @@ function sendMessage () {
 }
 
 function login () {
-	console.log("function")
+	//console.log("function")
 	name = document.querySelector(".login-form").value;
 	name = name.replace("<", "[Invalid Character]");
 	name = name.replace(">", "[Invalid Character]");
