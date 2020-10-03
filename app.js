@@ -1,6 +1,3 @@
-
-
-
 const firebaseConfig = {
     apiKey: "AIzaSyAHKgDIS_phtBzaZg3u2VZqHuTN_QmMfJI",
     authDomain: "fir-chat-e85ad.firebaseapp.com",
@@ -14,62 +11,33 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
+function escape(str) {
+    let blacklist = ["<", ">", "/", "eval", "img", "a"];
+    for(let chr of blacklist) {
+        let regex = new RegExp(chr, "g");
+        str = str.replace(regex, "*");
+    }
+    return str;
+}
 
 name = "User"
 
 function sendMessage () {
     // function to send a message into the database
     let message = document.querySelector(".message").value;
-    while(message.indexOf("<")!=-1){
-        message = message.replace("<", "[Invalid Character]");
-    }
-    while(message.indexOf(">")!=-1){
-        message = message.replace(">", "[Invalid Character]");
-    }
-    while(message.indexOf("/")!=-1){
-        message = message.replace("/", "[Invalid Character]");
-    }
-    while(message.indexOf("eval")!=-1){
-        message = message.replace("eval", "[Invalid Expression]");
-    }
-    while(message.indexOf("img")!=-1){
-        message = message.replace("img", "[Invalid Expression]");
-    }
-    
-
-
-    
-        firebase.database().ref("messages").push().set({
-            "sender":name,
-            "message":message
-
-        })
+    message = escape(message);
+    firebase.database().ref("messages").push().set({
+        "sender":name,
+        "message":message
+    });
     document.querySelector(".message").value = "";    
-
     return false;
 }
 
 function login () {
     //console.log("function")
     name = document.querySelector(".login-form").value;
-    
-    while(name.indexOf("<")!=-1){
-        name = name.replace("<", "[Invalid Character]");
-    }
-    while(name.indexOf(">")!=-1){
-        name = name.replace(">", "[Invalid Character]");
-    }
-    while(name.indexOf("/")!=-1){
-        name = name.replace("/", "[Invalid Character]");
-    }
-    while(name.indexOf("eval")!=-1){
-        name = name.replace("eval", "[Invalid Expression]");
-    }
-    while(name.indexOf("img")!=-1){
-        name = name.replace("img", "[Invalid Expression]");
-    }
-
-    
+    name = escape(name);
     if (name.length > 20){
         name = name.slice(0, 20)
     }
@@ -80,20 +48,11 @@ function login () {
 
 firebase.database().ref("messages").on("child_added", (snapshot) => {
     let html = document.querySelector(".messages").innerHTML;
-    
-    
-    
     while(html.indexOf("eval")!=-1){
         html = html.replace("eval", "[Invalid Expression]");
     }
     while(html.indexOf("img")!=-1){
         html = html.replace("img", "[Invalid Expression]");
     }
-    
-
-    
-    
-    
     document.querySelector(".messages").innerHTML = `<li><i class="fa fa-user-circle"></i><span class="message-text">${snapshot.val().sender}: ${snapshot.val().message} </span></li>` + html;
-})
-
+});
